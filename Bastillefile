@@ -1,0 +1,53 @@
+# base setup Bastille Jail Template
+# version 0.1.0  2020-10-29
+
+# SUPPORTED 	format 	example
+# ---------------------------
+# LIMITS 	resource value 	memoryuse 1G
+# INCLUDE 	template path/URL 	http?://TEMPLATE_URL or username/base-template
+# PRE 	/bin/sh command 	mkdir -p /usr/local/path
+# FSTAB 	fstab syntax 	/host/path container/path nullfs ro 0 0
+# PKG 	port/pkg name(s) 	vim-console zsh git-lite tree htop
+# OVERLAY 	paths (one/line) 	etc usr
+# SYSRC 	sysrc command(s) 	nginx_enable=YES
+# SERVICE 	service command(s) 	nginx restart
+# CMD 	/bin/sh command 	/usr/bin/chsh -s /usr/local/bin/zsh
+#
+# PLANNED 	format 	example
+# -------------------------
+# RDR 	pf rdr entry 	rdr pass inet proto tcp from any to any port 80 -> 10.17.89.80
+# LOG 	path 	/var/log/nginx/access.log
+####################################################################################
+
+# stage some directories, etc.
+PRE mkdir -p /service /var/log/dnslog/{tinydns,axfrdns}
+PRE chmod -R 770 /var/log/dnslog
+PRE chown -R dnslog:dnslog /var/log/dnslog
+PRE echo "svscan_servicedir=/service" >> /etc/rc.conf
+PRE ifconfig bastille0 |grep "inet " |awk '{print $2}' > /tmp/IP
+PRE for U in dnslog tinydns axfrdns dnscache ; do pw useradd -n "$U" -c "$U daemon" -m -s /usr/sbin/nologin ; done
+
+# Install needed packages
+PKG bash bash-completion ccze colordiff curl htop mc nmap sudo tmux tree vim-console wget djbdns tai64nfrac
+
+#Start needed services at boot time
+SYSRC svscan_enable=YES
+
+# Start the service immediately
+#SERVICE openvpn_zenith start
+
+CMD /usr/bin/chsh -s /usr/local/bin/bash
+CMD tinydns-conf tinydns dnslog /var/tinydns $(cat /tmpIP)
+CMD sed -i .bak s/^exec/#exec/ /var/tinydns/log/run
+CMD echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/tinydns" >> /var/tinydns/log/run
+CMD rm -rf /var/tinydns/log/main
+CMD ln -s /var/tinydns /service
+
+CMD axfrdns-conf axfrdns dnslog /var/axfrdns /var/tinydns $IP
+CMD sed -i .bak s/^exec/#exec/ /var/axfrdns/log/run
+CMD echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/axfrdns" >> /var/axfrdns/log/run
+CMD grep -v ^# /var/axfrdns/tcp
+CMD cd /var/axfrdns && make
+CMD rm -rf /var/axfrdns/log/main
+CMD ln -s /var/axfrdns /service
+
