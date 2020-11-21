@@ -7,3 +7,19 @@ chmod -R 770 /var/log/dnslog
 chown -R dnslog:dnslog /var/log/dnslog
 echo "svscan_servicedir=/service" >> /etc/rc.conf
 ifconfig bastille0 |grep "inet " |awk '{print $2}' > /tmp/IP
+
+/usr/bin/chsh -s /usr/local/bin/bash
+tinydns-conf tinydns dnslog /var/tinydns $(cat /tmp/IP)
+sed -i .bak s/^exec/#exec/ /var/tinydns/log/run
+echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/tinydns" >> /var/tinydns/log/run
+rm -rf /var/tinydns/log/main
+ln -s /var/tinydns /service
+
+axfrdns-conf axfrdns dnslog /var/axfrdns /var/tinydns $(cat /tmp/IP)
+sed -i .bak s/^exec/#exec/ /var/axfrdns/log/run
+echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/axfrdns" >> /var/axfrdns/log/run
+grep -v ^# /var/axfrdns/tcp
+cd /var/axfrdns && make
+rm -rf /var/axfrdns/log/main
+ln -s /var/axfrdns /service
+

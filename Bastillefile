@@ -23,7 +23,8 @@
 #PRE (inside the PRE file)
 
 # Install needed packages
-PKG bash bash-completion ccze colordiff curl htop mc nmap sudo tmux tree vim-console wget djbdns tai64nfrac
+#PKG bash bash-completion ccze colordiff curl htop mc nmap sudo tmux tree vim-console wget djbdns tai64nfrac
+PKG bash bash-completion ccze colordiff htop nmap tree vim-console djbdns tai64nfrac
 
 #Start needed services at boot time
 SYSRC svscan_enable=YES
@@ -31,17 +32,3 @@ SYSRC svscan_enable=YES
 # Start the service immediately
 SERVICE svscan start
 
-CMD /usr/bin/chsh -s /usr/local/bin/bash
-CMD tinydns-conf tinydns dnslog /var/tinydns $(cat /tmp/IP)
-CMD sed -i .bak s/^exec/#exec/ /var/tinydns/log/run
-CMD echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/tinydns" >> /var/tinydns/log/run
-CMD rm -rf /var/tinydns/log/main
-CMD ln -s /var/tinydns /service
-
-CMD axfrdns-conf axfrdns dnslog /var/axfrdns /var/tinydns $(cat /tmp/IP)
-CMD sed -i .bak s/^exec/#exec/ /var/axfrdns/log/run
-CMD echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/axfrdns" >> /var/axfrdns/log/run
-CMD grep -v ^# /var/axfrdns/tcp
-CMD cd /var/axfrdns && make
-CMD rm -rf /var/axfrdns/log/main
-CMD ln -s /var/axfrdns /service
