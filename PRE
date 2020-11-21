@@ -1,0 +1,9 @@
+for U in dnslog tinydns axfrdns dnscache ; do
+  pw useradd -n "$U" -c "$U daemon" -m -s /usr/sbin/nologin
+done
+
+mkdir -p /service /var/log/dnslog/tinydns /var/log/dnslog/axfrdns
+chmod -R 770 /var/log/dnslog
+chown -R dnslog:dnslog /var/log/dnslog
+echo "svscan_servicedir=/service" >> /etc/rc.conf
+ifconfig bastille0 |grep "inet " |awk '{print $2}' > /tmp/IP
