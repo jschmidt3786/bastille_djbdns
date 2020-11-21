@@ -24,9 +24,10 @@
 
 # Install needed packages
 #PKG bash bash-completion ccze colordiff curl htop mc nmap sudo tmux tree vim-console wget djbdns tai64nfrac
-PKG bash bash-completion ccze colordiff htop nmap tree vim-console djbdns tai64nfrac
+PKG bash bash-completion ccze colordiff htop nmap tree vim-console daemontools ucspi-tcp djbdns tai64nfrac
 
 #Start needed services at boot time
+SYSRC sshd_enable=YES
 SYSRC svscan_enable=YES
 
 # Start the service immediately
