@@ -20,12 +20,7 @@
 ####################################################################################
 
 # stage some directories, etc.
-PRE mkdir -p /service /var/log/dnslog/{tinydns,axfrdns}
-PRE chmod -R 770 /var/log/dnslog
-PRE chown -R dnslog:dnslog /var/log/dnslog
-PRE echo "svscan_servicedir=/service" >> /etc/rc.conf
-PRE ifconfig bastille0 |grep "inet " |awk '{print $2}' > /tmp/IP
-PRE for U in dnslog tinydns axfrdns dnscache ; do pw useradd -n "$U" -c "$U daemon" -m -s /usr/sbin/nologin ; done
+#PRE (inside the PRE file)
 
 # Install needed packages
 PKG bash bash-completion ccze colordiff curl htop mc nmap sudo tmux tree vim-console wget djbdns tai64nfrac
@@ -34,20 +29,19 @@ PKG bash bash-completion ccze colordiff curl htop mc nmap sudo tmux tree vim-con
 SYSRC svscan_enable=YES
 
 # Start the service immediately
-#SERVICE openvpn_zenith start
+SERVICE svscan start
 
 CMD /usr/bin/chsh -s /usr/local/bin/bash
-CMD tinydns-conf tinydns dnslog /var/tinydns $(cat /tmpIP)
+CMD tinydns-conf tinydns dnslog /var/tinydns $(cat /tmp/IP)
 CMD sed -i .bak s/^exec/#exec/ /var/tinydns/log/run
 CMD echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/tinydns" >> /var/tinydns/log/run
 CMD rm -rf /var/tinydns/log/main
 CMD ln -s /var/tinydns /service
 
-CMD axfrdns-conf axfrdns dnslog /var/axfrdns /var/tinydns $IP
+CMD axfrdns-conf axfrdns dnslog /var/axfrdns /var/tinydns $(cat /tmp/IP)
 CMD sed -i .bak s/^exec/#exec/ /var/axfrdns/log/run
 CMD echo "exec setuidgid dnslog multilog t s16777215 n100 /var/log/dnslog/axfrdns" >> /var/axfrdns/log/run
 CMD grep -v ^# /var/axfrdns/tcp
 CMD cd /var/axfrdns && make
 CMD rm -rf /var/axfrdns/log/main
 CMD ln -s /var/axfrdns /service
-
