@@ -6,6 +6,7 @@ INCLUDE jschmidt3786/bastille_base
 PKG daemontools ucspi-tcp djbdns tai64nfrac
 #CP script...
 #CMD script...
+# for now, PRE script seems to be working well
 
 SYSRC svscan_enable=YES
 SERVICE svscan start

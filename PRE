@@ -1,7 +1,4 @@
 #!/usr/bin/env bash -x
-sed -i \-$(date +%s).bak s/^#PermitRootLogin.*/PermitRootLogin\ prohibit-password/ /etc/ssh/sshd_config
-
-/usr/bin/chsh -s /usr/local/bin/bash
 
 for U in dnslog tinydns axfrdns dnscache ; do
   pw useradd -n "$U" -c "$U daemon" -m -s /usr/sbin/nologin
