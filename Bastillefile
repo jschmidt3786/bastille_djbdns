@@ -1,8 +1,7 @@
 # base setup Bastille Jail Template
 # version 0.2.0  2021-1-20
 
-# stage some directories, etc.
-#PRE (inside the PRE file)
+INCLUDE jschmidt3786/bastille_base
 
 PKG daemontools ucspi-tcp djbdns tai64nfrac
 #CP script...
