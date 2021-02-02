@@ -1,8 +1,5 @@
 # base setup Bastille Jail Template
 # version 0.2.0  2021-1-20
-
-INCLUDE jschmidt3786/bastille_base
-
 PKG daemontools ucspi-tcp djbdns tai64nfrac
 #CP script...
 #CMD script...
@@ -12,3 +9,8 @@ SYSRC svscan_enable=YES
 SERVICE svscan start
 RDR udp 53 53
 RDR tcp 53 53
+
+# for replication via rsync
+SYSRC sshd_enable=YES
+SERVICE sshd start
+#RDR tcp ...
