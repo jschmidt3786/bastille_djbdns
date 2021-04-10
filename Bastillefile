@@ -1,9 +1,7 @@
-# base setup Bastille Jail Template
-# version 0.2.0  2021-1-20
+# base setup Bastille Jail Template for tinydns
 PKG daemontools ucspi-tcp djbdns tai64nfrac
-#CP script...
-#CMD script...
-# for now, PRE script seems to be working well
+CP root /
+CMD /root/bootstrap.sh
 
 SYSRC svscan_enable=YES
 SERVICE svscan start
@@ -13,4 +11,4 @@ RDR tcp 53 53
 # for replication via rsync
 SYSRC sshd_enable=YES
 SERVICE sshd start
-#RDR tcp ...
+#RDR tcp .. 22
