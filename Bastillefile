@@ -9,6 +9,7 @@ RDR udp 53 53
 RDR tcp 53 53
 
 # for replication via rsync
+PKG rsync
 SYSRC sshd_enable=YES
 SERVICE sshd start
 #RDR tcp .. 22
