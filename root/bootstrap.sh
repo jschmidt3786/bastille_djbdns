@@ -6,16 +6,20 @@ set -o pipefail
 # only allowed to run once (say... "fragile")
 [ -f /var/tmp/djbdns_fin ] && exit 0
 
-#for U in dnslog tinydns axfrdns dnscache ; do
-#  pw useradd -n "$U" -c "$U daemon" -m -s /usr/sbin/nologin
-#done
+(getent group dnslog) || pw groupadd -n dnslog
+
+for U in dnslog tinydns axfrdns dnscache ; do
+  (getent passwd $U) || \
+  pw useradd -n "$U" -c "$U daemon" -m -s /usr/sbin/nologin
+done
 
 mkdir -p /var/service /var/log/dnslog/tinydns /var/log/dnslog/axfrdns
 chmod -R 770 /var/log/dnslog
 chown -R dnslog:dnslog /var/log/dnslog
 #echo "svscan_servicedir=/var/service" >> /etc/rc.conf
 sysrc svscan_servicedir="/var/service"
-ifconfig bastille0 |grep "inet " |awk '{print $2}' > /tmp/IP
+(ifconfig bastille0 |grep "inet " |awk '{print $2}' > /tmp/IP) || \
+(ifconfig vnet0 |grep "inet " |awk '{print $2}' > /tmp/IP)
 
 tinydns-conf tinydns dnslog /var/tinydns "$(cat /tmp/IP)"
 sed -i .bak s/^exec/#exec/ /var/tinydns/log/run
